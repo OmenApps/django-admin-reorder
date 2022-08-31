@@ -24,13 +24,13 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
-    name='django-modeladmin-reorder',
+    name='django-admin-reorder',
     version=version,
     description="""Custom ordering for the apps and models in the admin app.""",
     long_description=readme + '\n\n' + history,
-    author='Mishbah Razzaque',
-    author_email='mishbahx@gmail.com',
-    url='https://github.com/mishbahr/django-modeladmin-reorder',
+    author='Jack Linke',
+    author_email='jack@watervize.com',
+    url='https://github.com/OmenApps/django-admin-reorder',
     packages=[
         'admin_reorder',
     ],
@@ -40,16 +40,17 @@ setup(
     ],
     license="BSD",
     zip_safe=False,
-    keywords='django-modeladmin-reorder',
+    keywords='django-admin-reorder',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
 
     ],
 )

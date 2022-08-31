@@ -85,25 +85,31 @@ Configuration
 
    .. code-block:: python
 
-    ADMIN_REORDER = (
+    ADMIN_REORDER_MODEL_LIST = (
         # Keep original label and models
-        'sites',
+        "sites",
 
         # Rename app
-        {'app': 'auth', 'label': 'Authorisation'},
+        {"app": "auth", "label": "Authorization"},
 
         # Reorder app models
-        {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
+        {"app": "auth", "models": ("auth.User", "auth.Group")},
 
         # Exclude models
-        {'app': 'auth', 'models': ('auth.User', )},
+        {"app": "auth", "models": ("auth.User",)},
 
         # Cross-linked models
-        {'app': 'auth', 'models': ('auth.User', 'sites.Site')},
+        {"app": "auth", "models": ("auth.User", "sites.Site")},
 
-        # models with custom name
-        {'app': 'auth', 'models': (
-            'auth.Group',
-            {'model': 'auth.User', 'label': 'Staff'},
-        )},
+        # Cross-linked models with wildcard
+        {"app": "auth", "models": ("auth.User", "sites.*")},
+
+        # Models with custom name
+        {
+            "app": "auth",
+            "models": (
+                "auth.Group",
+                {"model": "auth.User", "label": "Staff"},
+            ),
+        },
     )
