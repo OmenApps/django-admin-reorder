@@ -63,8 +63,10 @@ class ModelAdminReorder(MiddlewareMixin):
 
         if "app_list" in response.context_data:
             response_context_key = "app_list"
+            logger.info(f"key 'app_list' in response.context_data")
         elif "available_apps" in response.context_data:
             response_context_key = "available_apps"
+            logger.info(f"key 'available_apps' in response.context_data")
         else:
             # there is no app_list! nothing to reorder
             logger.info(f"No app list available in response.context_data")
