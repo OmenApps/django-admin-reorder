@@ -270,7 +270,7 @@ class ModelAdminReorder(MiddlewareMixin):
             return response
 
         # Get the context_key for response, returning response now if not present
-        init_response_context_key(response)
+        self.init_response_context_key(response)
         if self.response_context_key is None:
             return response
 
