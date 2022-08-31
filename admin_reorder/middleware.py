@@ -69,7 +69,7 @@ class ModelAdminReorder(MiddlewareMixin):
             # there is no app_list! nothing to reorder
             logger.info(f"No app list available in response.context_data")
             response_context_key = None
-            
+
         self.response_context_key = response_context_key
 
     def get_project_apps_list(self, response):
@@ -240,14 +240,14 @@ class ModelAdminReorder(MiddlewareMixin):
 
         return [self.get_valid_model_from_str(model.label) for model in app_models]
 
-    def validate_admin_urls(self):
+    def validate_admin_urls(self, request):
         """
         Checks that we are admin and that the current url_name
         matches one in the provided list of url names.
         Defaults to `["index", "app_list"]`
         """
         try:
-            url = resolve(self.request.path_info)
+            url = resolve(request.path_info)
         except Resolver404:
             return False
 
@@ -264,7 +264,7 @@ class ModelAdminReorder(MiddlewareMixin):
         https://docs.djangoproject.com/en/4.1/topics/http/middleware/#process-template-response
         """
 
-        if not self.validate_admin_urls():
+        if not self.validate_admin_urls(request):
             # Current view is not a valid django admin view
             # bail out!
             return response
