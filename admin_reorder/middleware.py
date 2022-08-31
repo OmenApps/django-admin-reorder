@@ -16,13 +16,19 @@ logger = logging.getLogger(__name__)
 class ModelAdminReorder(MiddlewareMixin):
     settings_config = "ADMIN_REORDER_MODEL_LIST"
     settings_valid_url_names = "ADMIN_REORDER_VALID_URL_NAMES"
+    settings_append_unrepresented_models = "ADMIN_APPEND_UNREPRESENTED_MODELS"
 
     def init_config(self, request, response):
-        """ """
+        """
+        Initializes configuration
+        """
         self.request = request
         self.config = getattr(settings, self.settings_config, None)
         self.valid_url_names = getattr(
             settings, self.settings_valid_url_names, ["index", "app_list"]
+        )
+        self.append_unrepresented_models = getattr(
+            settings, self.settings_append_unrepresented_models, False
         )
 
         if not self.config:
@@ -72,7 +78,9 @@ class ModelAdminReorder(MiddlewareMixin):
             response_context_key = None
 
         self.response_context_key = response_context_key
-        logger.info(f"response_context_key: {response_context_key}, self.response_context_key: {self.response_context_key}")
+        logger.info(
+            f"response_context_key: {response_context_key}, self.response_context_key: {self.response_context_key}"
+        )
         return
 
     def get_project_apps_list(self, response):
@@ -88,7 +96,7 @@ class ModelAdminReorder(MiddlewareMixin):
         Returns a flat listing of all models within installed apps in the project
         """
         self.models_list = []
-        for app in self.project_apps_list():
+        for app in self.project_apps_list:
             for model in app["models"]:
                 model["model_name"] = self.get_model_name(
                     app["app_label"], model["object_name"]
@@ -114,6 +122,13 @@ class ModelAdminReorder(MiddlewareMixin):
         #     if app:
         #         reordered_apps_list.append(app)
         # return reordered_apps_list
+
+        """
+        ToDo:   Before we return the final reordered list for the response, if 
+                self.append_unrepresented_models is True, then we need to identify
+                which models are not yet represented in the app_config, and create
+                and append one more app_cofig to represent these.
+        """
 
         return [self.process_app_config(app_config) for app_config in self.config]
 
@@ -196,7 +211,9 @@ class ModelAdminReorder(MiddlewareMixin):
                     model = self.get_valid_model_from_str(model_name=model_config)
                 else:
                     # Deal with wildcards in a model_config entry
-                    models = self.process_model_config_wildcard(model_wildcard=model_config)
+                    models = self.process_model_config_wildcard(
+                        model_wildcard=model_config
+                    )
                     for model in models:
                         ordered_models_list.append(model)
 
@@ -237,7 +254,7 @@ class ModelAdminReorder(MiddlewareMixin):
         """
 
         # Get the app name from the string
-        app_name = model_wildcard.split('.*')[0]
+        app_name = model_wildcard.split(".*")[0]
 
         # Get a list of model names for the app
         app_models = apps.get_app_config(app_name).get_models()
@@ -281,5 +298,7 @@ class ModelAdminReorder(MiddlewareMixin):
         self.init_config(request, response)
 
         # Replace the original app list in the context with our reordered app list
-        response.context_data[self.response_context_key] = self.get_reordered_apps_list()
+        response.context_data[
+            self.response_context_key
+        ] = self.get_reordered_apps_list()
         return response
