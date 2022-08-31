@@ -98,7 +98,7 @@ class ModelAdminReorder(MiddlewareMixin):
         self.models_list = []
         for app in self.project_apps_list:
             for model in app["models"]:
-                model["model_name"] = self.get_model_name(
+                model["model_name"] = self.get_formatted_model_name(
                     app["app_label"], model["object_name"]
                 )
                 self.models_list.append(model)
