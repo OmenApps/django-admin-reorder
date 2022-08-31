@@ -42,7 +42,7 @@ class ModelAdminReorder(MiddlewareMixin):
                 f"Got {self.valid_url_names}"
             )
 
-        self.project_apps_list = self.get_project_apps_list()
+        self.project_apps_list = self.get_project_apps_list(response)
         self.project_models_list = self.get_project_models_list()
 
         logger.info(
