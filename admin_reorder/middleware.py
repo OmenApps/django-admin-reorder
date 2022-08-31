@@ -1,3 +1,5 @@
+import logging
+
 from copy import deepcopy
 
 from django.apps import apps
@@ -7,6 +9,8 @@ from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import Resolver404, resolve
 from django.utils.deprecation import MiddlewareMixin
+
+logger = logging.getLogger(__name__)
 
 
 class ModelAdminReorder(MiddlewareMixin):
@@ -20,7 +24,7 @@ class ModelAdminReorder(MiddlewareMixin):
         self.valid_url_names = getattr(
             settings, self.settings_valid_url_names, ["index", "app_list"]
         )
-        self.response_context_key = self.get_response_context_key(response)
+        self.response_context_key = None
 
         if not self.config:
             # ADMIN_REORDER settings is not defined.
@@ -41,18 +45,32 @@ class ModelAdminReorder(MiddlewareMixin):
         self.project_apps_list = self.get_project_apps_list()
         self.project_models_list = self.get_project_models_list()
 
-    def get_response_context_key(self, response):
+        logger.info(
+            f"End of init_config:\n\nself.request: "
+            f"{self.request}\n\nself.config: {self.config}"
+            f"\n\nself.valid_url_names: {self.valid_url_names}"
+            f"\n\nself.response_context_key: {self.response_context_key}"
+            f"\n\nself.project_apps_list: {self.project_apps_list}"
+            f"\n\nself.project_models_list: {self.project_models_list}"
+        )
+
+    def init_response_context_key(self, response):
         """
-        Get the correct context_key for the response, returning
-        `None` if there is no context_key
+        Get the correct context_key for the response, and if
+        present, set `self.response_context_key`
         """
+        logger.info(f"response.context_data: {response.context_data}")
+
         if "app_list" in response.context_data:
-            return "app_list"
+            response_context_key = "app_list"
         elif "available_apps" in response.context_data:
-            return "available_apps"
+            response_context_key = "available_apps"
         else:
             # there is no app_list! nothing to reorder
-            return None
+            logger.info(f"No app list available in response.context_data")
+            response_context_key = None
+            
+        self.response_context_key = response_context_key
 
     def get_project_apps_list(self, response):
         """
@@ -222,14 +240,14 @@ class ModelAdminReorder(MiddlewareMixin):
 
         return [self.get_valid_model_from_str(model.label) for model in app_models]
 
-    def validate_admin_urls(self, request):
+    def validate_admin_urls(self):
         """
         Checks that we are admin and that the current url_name
         matches one in the provided list of url names.
         Defaults to `["index", "app_list"]`
         """
         try:
-            url = resolve(request.path_info)
+            url = resolve(self.request.path_info)
         except Resolver404:
             return False
 
@@ -246,12 +264,13 @@ class ModelAdminReorder(MiddlewareMixin):
         https://docs.djangoproject.com/en/4.1/topics/http/middleware/#process-template-response
         """
 
-        if not self.validate_admin_urls(request):
+        if not self.validate_admin_urls():
             # Current view is not a valid django admin view
             # bail out!
             return response
 
         # Get the context_key for response, returning response now if not present
+        init_response_context_key(response)
         if self.response_context_key is None:
             return response
 
