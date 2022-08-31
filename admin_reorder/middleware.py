@@ -220,7 +220,7 @@ class ModelAdminReorder(MiddlewareMixin):
         # Get a list of model names for the app
         app_models = apps.get_app_config(app_name).get_models()
 
-        return [get_valid_model_from_str(model.label) for model in app_models]
+        return [self.get_valid_model_from_str(model.label) for model in app_models]
 
     def validate_admin_urls(self, request):
         """
@@ -246,7 +246,7 @@ class ModelAdminReorder(MiddlewareMixin):
         https://docs.djangoproject.com/en/4.1/topics/http/middleware/#process-template-response
         """
 
-        if not validate_admin_urls(request):
+        if not self.validate_admin_urls(request):
             # Current view is not a valid django admin view
             # bail out!
             return response
@@ -256,8 +256,7 @@ class ModelAdminReorder(MiddlewareMixin):
             return response
 
         self.init_config(request, response)
-        reordered_apps_list = self.get_reordered_apps_list()
 
         # Replace the original app list in the context with our reordered app list
-        response.context_data[self.response_context_key] = reordered_apps_list
+        response.context_data[self.response_context_key] = self.get_reordered_apps_list()
         return response
