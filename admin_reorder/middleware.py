@@ -24,7 +24,6 @@ class ModelAdminReorder(MiddlewareMixin):
         self.valid_url_names = getattr(
             settings, self.settings_valid_url_names, ["index", "app_list"]
         )
-        self.response_context_key = None
 
         if not self.config:
             # ADMIN_REORDER settings is not defined.
