@@ -116,15 +116,7 @@ class ModelAdminReorder(MiddlewareMixin):
         """
         Returns the final ordered list of apps used by Admin in
         the middleware response
-        """
-        # reordered_apps_list = []
-        # for app_config in self.config:
-        #     app = self.process_app_config(app_config)
-        #     if app:
-        #         reordered_apps_list.append(app)
-        # return reordered_apps_list
 
-        """
         ToDo:   Before we return the final reordered list for the response, if 
                 self.append_unrepresented_models is True, then we need to identify
                 which models are not yet represented in the app_config, and create
@@ -206,12 +198,13 @@ class ModelAdminReorder(MiddlewareMixin):
                 f"Got {repr(models_config)}"
             )
 
-        ordered_models_list = []
+        initial_models_list = []
         for model_config in models_config:
             model = None
             if isinstance(model_config, dict):
                 model = self.process_model_config(model_config=model_config)
-            else:  # str model_label e.g.: app.Model
+            else:
+                # str model_label e.g.: app.Model
                 if not ".*" in model_config:
                     model = self.get_valid_model_from_str(model_name=model_config)
                 else:
@@ -220,10 +213,19 @@ class ModelAdminReorder(MiddlewareMixin):
                         model_wildcard=model_config
                     )
                     for model in models:
-                        ordered_models_list.append(model)
+                        if model:
+                            initial_models_list.append(model)
 
             if model:
-                ordered_models_list.append(model)
+                initial_models_list.append(model)
+
+            # De-duplicate the list of models within this models_config
+            ordered_models_list = [
+                dict(model_tuple)
+                for model_tuple in set(
+                    tuple(model_dict.items()) for model_dict in initial_models_list
+                )
+            ]
 
         return ordered_models_list
 
@@ -264,7 +266,13 @@ class ModelAdminReorder(MiddlewareMixin):
         # Get a list of model names for the app
         app_models = apps.get_app_config(app_name).get_models()
 
-        return [self.get_valid_model_from_str(model._meta.label) for model in app_models]
+        valid_model_list = []
+        for model in app_models:
+            valid_model = self.get_valid_model_from_str(model._meta.label)
+            if valid_model:
+                valid_model_list.append(valid_model)
+
+        return valid_model_list
 
     def validate_admin_urls(self, request):
         """
