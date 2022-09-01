@@ -109,7 +109,7 @@ class ModelAdminReorder(MiddlewareMixin):
         Formats the model name if needed
         """
         if "." not in model_name:
-            model_name = f"app_name.model_name"
+            model_name = f"{app_name}.{model_name}"
         return model_name
 
     def get_reordered_apps_list(self):
