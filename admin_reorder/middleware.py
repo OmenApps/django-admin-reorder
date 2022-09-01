@@ -219,13 +219,19 @@ class ModelAdminReorder(MiddlewareMixin):
             if model:
                 initial_models_list.append(model)
 
+            logger.info(f"initial_models_list = {initial_models_list}")
+
+            # ToDo: Fix the code below
+            
             # De-duplicate the list of models within this models_config
-            ordered_models_list = [
-                dict(model_tuple)
-                for model_tuple in set(
-                    tuple(model_dict.items()) for model_dict in initial_models_list
-                )
-            ]
+            # ordered_models_list = [
+            #     dict(model_tuple)
+            #     for model_tuple in set(
+            #         tuple(model_dict.items()) for model_dict in initial_models_list
+            #     )
+            # ]
+
+            ordered_models_list = initial_models_list
 
         return ordered_models_list
 
