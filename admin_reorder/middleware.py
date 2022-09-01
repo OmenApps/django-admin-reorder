@@ -264,7 +264,7 @@ class ModelAdminReorder(MiddlewareMixin):
         # Get a list of model names for the app
         app_models = apps.get_app_config(app_name).get_models()
 
-        return [self.get_valid_model_from_str(model.label) for model in app_models]
+        return [self.get_valid_model_from_str(model._meta.label) for model in app_models]
 
     def validate_admin_urls(self, request):
         """
