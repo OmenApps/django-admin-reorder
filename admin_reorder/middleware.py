@@ -52,11 +52,11 @@ class ModelAdminReorder(MiddlewareMixin):
 
         logger.info(
             f"End of init_config:\n\nself.request: "
-            f"{self.request}\n\nself.config: {self.config}"
-            f"\n\nself.valid_url_names: {self.valid_url_names}"
-            f"\n\nself.response_context_key: {self.response_context_key}"
-            f"\n\nself.project_apps_list: {self.project_apps_list}"
-            f"\n\nself.project_models_list: {self.project_models_list}"
+            f"{self.request}\n\nself.config = {self.config}"
+            f"\n\nself.valid_url_names = {self.valid_url_names}"
+            f"\n\nself.response_context_key = {self.response_context_key}"
+            f"\n\nself.project_apps_list = {self.project_apps_list}"
+            f"\n\nself.project_models_list = {self.project_models_list}"
         )
 
     def init_response_context_key(self, response):
@@ -64,7 +64,7 @@ class ModelAdminReorder(MiddlewareMixin):
         Get the correct context_key for the response, and if
         present, set `self.response_context_key`
         """
-        logger.info(f"response.context_data: {response.context_data}")
+        logger.info(f"response.context_data = {response.context_data}")
 
         if "app_list" in response.context_data:
             response_context_key = "app_list"
@@ -79,7 +79,7 @@ class ModelAdminReorder(MiddlewareMixin):
 
         self.response_context_key = response_context_key
         logger.info(
-            f"response_context_key: {response_context_key}, self.response_context_key: {self.response_context_key}"
+            f"response_context_key = {response_context_key}, self.response_context_key = {self.response_context_key}"
         )
         return
 
@@ -88,7 +88,7 @@ class ModelAdminReorder(MiddlewareMixin):
         Returns a listing of all installed apps in the project
         pulled from response context
         """
-        logger.info(f"self.response_context_key: {self.response_context_key}")
+        logger.info(f"self.response_context_key = {self.response_context_key}")
         return response.context_data[self.response_context_key]
 
     def get_project_models_list(self):
@@ -131,7 +131,11 @@ class ModelAdminReorder(MiddlewareMixin):
                 and append one more app_cofig to represent these.
         """
 
-        return [self.process_app_config(app_config) for app_config in self.config]
+        reordered_apps_list = [
+            self.process_app_config(app_config) for app_config in self.config
+        ]
+        logger.info(f"reordered_apps_list = {reordered_apps_list}")
+        return reordered_apps_list
 
     def process_app_config(self, app_config):
         """
