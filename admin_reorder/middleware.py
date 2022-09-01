@@ -95,13 +95,14 @@ class ModelAdminReorder(MiddlewareMixin):
         """
         Returns a flat listing of all models within installed apps in the project
         """
-        self.models_list = []
+        project_models_list = []
         for app in self.project_apps_list:
             for model in app["models"]:
                 model["model_name"] = self.get_formatted_model_name(
                     app["app_label"], model["object_name"]
                 )
-                self.models_list.append(model)
+                project_models_list.append(model)
+        return project_models_list
 
     def get_formatted_model_name(self, app_name, model_name):
         """
