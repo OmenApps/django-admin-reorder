@@ -219,9 +219,9 @@ class ModelAdminReorder(MiddlewareMixin):
             if model:
                 initial_models_list.append(model)
 
-            logger.info(f"initial_models_list = {initial_models_list}")
-            ordered_models_list = self.get_deduplicated_models_list(initial_models_list)
-            logger.info(f"ordered_models_list = {ordered_models_list}")
+        logger.info(f"initial_models_list = {initial_models_list}")
+        ordered_models_list = self.get_deduplicated_models_list(initial_models_list)
+        logger.info(f"ordered_models_list = {ordered_models_list}")
 
         return ordered_models_list
 
@@ -247,7 +247,7 @@ class ModelAdminReorder(MiddlewareMixin):
             ordered_models_tuple_list.append(model_tuple)
 
         # Deduplicate by converting the whole list to set
-        models_set = set(ordered_models_list)
+        models_set = set(ordered_models_tuple_list)
 
         # Convert back to dictionaries
         models_dict_list = []
