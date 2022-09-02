@@ -220,20 +220,45 @@ class ModelAdminReorder(MiddlewareMixin):
                 initial_models_list.append(model)
 
             logger.info(f"initial_models_list = {initial_models_list}")
-
-            # ToDo: Fix the code below
-            
-            # De-duplicate the list of models within this models_config
-            # ordered_models_list = [
-            #     dict(model_tuple)
-            #     for model_tuple in set(
-            #         tuple(model_dict.items()) for model_dict in initial_models_list
-            #     )
-            # ]
-
-            ordered_models_list = initial_models_list
+            ordered_models_list = self.get_deduplicated_models_list(initial_models_list)
+            logger.info(f"ordered_models_list = {ordered_models_list}")
 
         return ordered_models_list
+
+    def get_deduplicated_models_list(models_list):
+        """
+        Convert each model_dict into a model_tuple (first converting the internal
+        perms dict to a tuple). Then append the tuple to a models_list. Next 
+        convert the list of tuples to a set of tuples, removing the duplicates
+        Finally, convert everything back.
+        """
+        perms = None
+
+        ordered_models_tuple_list = []
+        for model_dict in models_list:
+
+            # perms is a dict inside the overall model_dict, so convert it first
+            perms = model_dict.get("perms")
+            perms = tuple(perms.items())
+            model_dict["perms"] = perms
+
+            # Convert the models_dict to a tuple and append to the list
+            model_tuple = tuple(model_dict.items())
+            ordered_models_tuple_list.append(model_tuple)
+
+        # Deduplicate by converting the whole list to set
+        models_set = set(ordered_models_list)
+
+        # Convert back to dictionaries
+        models_dict_list = []
+        for deduped_model in models_set:
+            deduped_model_dict = dict(deduped_model)
+
+            # Again, process perms
+            deduped_model_dict["perms"] = dict(deduped_model_dict["perms"])
+            models_dict_list.append(dict(deduped_model_dict))
+
+        return models_dict_list
 
     def get_valid_model_from_str(self, model_name):
         """
