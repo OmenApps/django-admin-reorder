@@ -239,8 +239,9 @@ class ModelAdminReorder(MiddlewareMixin):
 
             # perms is a dict inside the overall model_dict, so convert it first
             perms = model_dict.get("perms")
-            perms = tuple(perms.items())
-            model_dict["perms"] = perms
+            if isinstance(perms, dict):
+                perms = tuple(perms.items())
+                model_dict["perms"] = perms
 
             # Convert the models_dict to a tuple and append to the list
             model_tuple = tuple(model_dict.items())
