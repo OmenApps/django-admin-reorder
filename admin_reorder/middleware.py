@@ -18,15 +18,21 @@ class ModelAdminReorder(MiddlewareMixin):
     settings_valid_url_names = "ADMIN_REORDER_VALID_URL_NAMES"
     settings_append_unrepresented_models = "ADMIN_APPEND_UNREPRESENTED_MODELS"
 
+    def init_valid_urls(self, request):
+        self.valid_url_names = getattr(
+            settings, self.settings_valid_url_names, ["index", "app_list"]
+        )
+        logger.info(
+            f"End of init_valid_urls:\n\nself.request: "
+            f"\n\nself.valid_url_names = {self.valid_url_names}"
+        )
+
     def init_config(self, request, response):
         """
         Initializes configuration
         """
         self.request = request
         self.config = getattr(settings, self.settings_config, None)
-        self.valid_url_names = getattr(
-            settings, self.settings_valid_url_names, ["index", "app_list"]
-        )
         self.append_unrepresented_models = getattr(
             settings, self.settings_append_unrepresented_models, False
         )
@@ -53,7 +59,6 @@ class ModelAdminReorder(MiddlewareMixin):
         logger.info(
             f"End of init_config:\n\nself.request: "
             f"{self.request}\n\nself.config = {self.config}"
-            f"\n\nself.valid_url_names = {self.valid_url_names}"
             f"\n\nself.response_context_key = {self.response_context_key}"
             f"\n\nself.project_apps_list = {self.project_apps_list}"
             f"\n\nself.project_models_list = {self.project_models_list}"
@@ -330,6 +335,7 @@ class ModelAdminReorder(MiddlewareMixin):
         https://docs.djangoproject.com/en/4.1/topics/http/middleware/#process-template-response
         """
 
+        self.init_valid_urls(request)
         if not self.validate_admin_urls(request):
             # Current view is not a valid django admin view
             # bail out!
