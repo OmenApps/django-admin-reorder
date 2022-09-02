@@ -225,7 +225,7 @@ class ModelAdminReorder(MiddlewareMixin):
 
         return ordered_models_list
 
-    def get_deduplicated_models_list(models_list):
+    def get_deduplicated_models_list(self, models_list):
         """
         Convert each model_dict into a model_tuple (first converting the internal
         perms dict to a tuple). Then append the tuple to a models_list. Next 
