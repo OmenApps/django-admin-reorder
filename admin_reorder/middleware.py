@@ -291,6 +291,8 @@ class ModelAdminReorder(MiddlewareMixin):
             model["name"] = model_config["label"]
             return model
 
+    
+
     def process_model_config_wildcard(self, model_wildcard):
         """
         If we have a wildcard in a model_config (e.g.: "auth.*"),
@@ -308,6 +310,12 @@ class ModelAdminReorder(MiddlewareMixin):
             valid_model = self.get_valid_model_from_str(model._meta.label)
             if valid_model:
                 valid_model_list.append(valid_model)
+
+        def get_model_list_key(model):
+            """Used to sort the list alphabetically by `model_name`"""
+            return model["model_name"]
+
+        valid_model_list.sort(key=get_model_list_key)
 
         return valid_model_list
 
